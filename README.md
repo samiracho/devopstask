@@ -10,13 +10,14 @@ The project has been developed in a linux machine with Debian 11.
 - golang 1.18
 
 ### Project Setup:
-Create a file ansible/.vault_pass and set the vault password
-Add your AWS credentials e.g:
+- Create a file ansible/.vault_pass and set the vault password
+
+- Add your AWS credentials e.g:
 ``` sh
 export AWS_ACCESS_KEY_ID="AJDJSFHSDJHSDJHSDBF"
 export AWS_SECRET_ACCESS_KEY="SLJKSFJHSFEFBNFBFDFBSF"
 ``` 
-Run `./create-infrastructure.sh` to generate all required resources
+- Run `./create-infrastructure.sh` to generate all required resources
 
 ### Run the REST api locally:
 ```sh
