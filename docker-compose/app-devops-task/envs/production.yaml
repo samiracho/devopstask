@@ -4,4 +4,4 @@ services:
     restart: on-failure:10
     container_name: app-devops-task-production
     ports:
-      - 9000:9002
+      - 9002:9000
