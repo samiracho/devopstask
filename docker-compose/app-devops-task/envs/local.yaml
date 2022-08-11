@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  rest-api:
+    restart: on-failure:1
+    image: app-devops-task:local
+    container_name: app-devops-task-local
+    ports:
+      - 9000:9000

@@ -1,0 +1,7 @@
+version: '3.9'
+services:
+  rest-api:
+    restart: on-failure:10
+    container_name: app-devops-task-staging
+    ports:
+      - 9000:9001

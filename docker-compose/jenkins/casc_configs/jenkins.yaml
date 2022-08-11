@@ -1,0 +1,91 @@
+jenkins:
+  systemMessage: "\n\nSami DevOps task. Setup done with Jenkins CASC plugin.\n\n"
+
+  numExecutors: 1
+  mode: NORMAL
+  scmCheckoutRetryCount: 3
+  labelString: "master-label"  
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+       - id: admin
+         password: ${JENKINS_ADMIN_PASS}
+
+  authorizationStrategy:
+    globalMatrix:
+      grantedPermissions:
+        - "USER:Overall/Administer:admin"
+
+  crumbIssuer: "standard"
+
+  remotingSecurity:
+    enabled: true    
+
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "acceptFirstConnectionStrategy"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+        - basicSSHUserPrivateKey:
+            description: "Github default credentials"
+            id: "github-default-credentials"
+            privateKeySource:
+              directEntry:
+                privateKey: ${decodeBase64:${JENKINS_GITHUB_PRIVATE_KEY}}
+            scope: GLOBAL
+            username: "sami@racho.es"
+        - string:
+            description: "Github access token"
+            id: "github-access-token"
+            scope: GLOBAL
+            secret: ${JENKINS_GITHUB_ACCESS_TOKEN}
+        - usernamePassword:
+            id: "github-user-password"
+            password: "${JENKINS_GITHUB_ACCESS_TOKEN}"
+            scope: GLOBAL
+            username: "samiracho"
+
+tool:
+  git:
+    installations:
+      - name: Default
+        home: "git"
+
+unclassified:
+  location:
+    adminAddress: "Address not configured yet <nobody@nowhere>"
+    url: "https://${JENKINS_HOSTNAME}:8443/"
+  resourceRoot:
+    url: "https://${JENKINS_PUBLIC_IP}:8443/"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    configs:
+    - credentialsId: "github-access-token"
+      name: "Default github server"
+    hookUrl: "https://${JENKINS_HOSTNAME}:8443/github-webhook/"
+
+jobs:
+  - script: >
+      multibranchPipelineJob('devOps Task') {
+        branchSources {
+          github {
+            id('23232323') 
+            scanCredentialsId('github-user-password')
+            repoOwner('samiracho')
+            repository('devopstask')
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(5)
+          }
+        }
+      }

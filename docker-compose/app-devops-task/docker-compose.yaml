@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  rest-api:
+    restart: on-failure:10
+    image: app-devops-task:${ENV:-local}-${TAG:-latest}
+    container_name: app-devops-task-local
+    build:
+      context: ../../app-devops-task

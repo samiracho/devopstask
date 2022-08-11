@@ -1,0 +1,84 @@
+- hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    os_environment:
+      - key: JENKINS_HOSTNAME
+        value: "{{ inventory_hostname }}"
+      - key: JENKINS_PUBLIC_IP
+        value: "{{ jenkins_public_ip }}"
+  remote_user: ubuntu
+  tasks:
+  - name: customize /etc/environment
+    ansible.builtin.lineinfile:
+      dest: "/etc/environment"
+      state: present
+      regexp: "^{{ item.key }}="
+      line: "{{ item.key }}={{ item.value }}"
+    with_items: "{{ os_environment }}"
+  - name: Wait for system to become reachable
+    wait_for_connection:
+
+  - name: Install docker packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - python3-pip
+    tags:
+      - docker
+  - name: Install docker
+    shell: curl https://get.docker.com | sh
+
+  - name: Change privilege of docker
+    file: dest=/usr/bin/docker mode=+x
+
+  - name: Install python docker / docker-compose module
+    pip:
+      name:
+          - docker
+          - docker-compose
+  
+  - name: Create "docker" group
+    group:
+      name: docker
+      state: present
+
+  - name: Add remote "ubuntu" user to "docker" group
+    user:
+      name: ubuntu
+      groups: docker
+      append: yes
+  
+  - name: reset ssh connection to allow user changes to affect ansible user
+    ansible.builtin.meta:
+      reset_connection
+
+  - name: Copy Jenkins docker
+    copy:
+      src: ../docker-compose/jenkins/
+      dest: ./jenkins_home
+    become: false
+  
+  - name: Prepare Jenkins secrets
+    copy:
+      src: ../docker-compose/jenkins/secrets.env
+      dest: ./jenkins_home/secrets.decrypted.env
+      decrypt: yes
+      mode: '600'
+    become: false
+
+  - name: Stop Jenkins docker-compose
+    docker_compose:
+      project_src: jenkins_home
+      state: absent
+    become: false
+
+  - name: Start Jenkins docker-compose
+    docker_compose:
+      project_src: jenkins_home
+      state: present
+      build: true
+    become: false
+  

@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  jenkins:
+    user: ${CURRENT_UID:-1000:999}
+    restart: on-failure:10
+    image: jenkins-casc:latest
+    build:
+      context: .
+    container_name: my-jenkins
+    ports:
+      - 8443:8443
+    volumes:
+      - ./casc_configs:/var/jenkins_casc_configs
+      - $HOME/jenkins_home:/var/jenkins_home:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CASC_JENKINS_CONFIG=/var/jenkins_casc_configs
+      - JENKINS_HOSTNAME=${JENKINS_HOSTNAME:-localhost}
+    env_file:
+      - ./secrets.decrypted.env

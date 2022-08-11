@@ -1,0 +1,4 @@
+terraform/.terraform
+*-keypair.pem
+ansible/.vault_pass
+*decrypted.env
