@@ -4,4 +4,4 @@ services:
     restart: on-failure:10
     container_name: app-devops-task-staging
     ports:
-      - 9000:9001
+      - 9001:9000
