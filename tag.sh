@@ -39,7 +39,7 @@ NEW_TAG="v$VNUM1.$VNUM2.$VNUM3"
 if [ "$NEW_TAG" = "v..1" ]; then NEW_TAG='v1.0.0'; fi
 
 echo "Updating $VERSION to $NEW_TAG"
-exit
+
 #get current hash and see if it already has a tag
 GIT_COMMIT=$(git rev-parse HEAD)
 NEEDS_TAG=$(git describe --contains $GIT_COMMIT 2>/dev/null)
